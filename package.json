@@ -1,0 +1,15 @@
+{
+    "name": "pdf_to_text",
+    "version": "1.0.0",
+    "description": "Google Cloud Function",
+    "main": "index.js",
+    "scripts": {
+        "start": "functions-framework --target=pdf_to_text"
+    },
+    "dependencies": {
+        "@google-cloud/functions-framework": "^3.0.0",
+        "@supabase/supabase-js": "^1.28.5",
+        "cors": "^2.8.5",
+        "pdf-parse": "^1.1.1"
+    }
+}
