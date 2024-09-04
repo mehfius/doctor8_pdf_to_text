@@ -7,7 +7,8 @@ const path = require('path');
 const fetch = require('node-fetch');
 const { download_card } = require("./src/supabase/download_card");
 const { pdf_to_ia } = require("./src/pdf_to_ia");
-const { update_descricao } = require("./src/supabase/update_descricao");
+const { update_prontuarios } = require("./src/supabase/update_prontuarios");
+const { update_exames } = require("./src/supabase/update_exames");
 
 functions.http('pdf_to_text', async (req, res) => {
     corsMiddleware(req, res, async () => {
@@ -15,9 +16,11 @@ functions.http('pdf_to_text', async (req, res) => {
            
             let json = await download_card(req);       
 
-            let objIAanalise = await pdf_to_ia(json);       
+            let objIAanalise = await pdf_to_ia(json);        
 
-            await update_descricao(objIAanalise)
+            await update_exames(objIAanalise);
+
+            let prontuarios = await update_prontuarios(objIAanalise);
 
             const directory = './temp/';
 

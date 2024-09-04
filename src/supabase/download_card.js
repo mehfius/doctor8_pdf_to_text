@@ -22,7 +22,6 @@ const download_card = async function (req) {
         throw error;
     }
 
-    // Mapear os arquivos para um array de promessas de download
     const downloadPromises = data.files.map(item => {
 
         return new Promise((resolve, reject) => {
@@ -30,8 +29,6 @@ const download_card = async function (req) {
             const url = `https://vflhuqqzjmgkdhjgxzni.supabase.co/storage/v1/object/public/pdf/${item.files}/${filename}`;
             const file = fs.createWriteStream(path.join('./temp/', filename));
             
-            console.log(url);
-
             https.get(url, (response) => {
                 response.pipe(file);
                 file.on('finish', () => {
