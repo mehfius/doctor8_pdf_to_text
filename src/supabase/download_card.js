@@ -28,7 +28,9 @@ const download_card = async function (req) {
         return new Promise((resolve, reject) => {
             const filename = item.filename;
             const url = `https://vflhuqqzjmgkdhjgxzni.supabase.co/storage/v1/object/public/pdf/${item.files}/${filename}`;
-            const file = fs.createWriteStream(path.join('./temp', filename));
+            const file = fs.createWriteStream(path.join('./temp/', filename));
+            
+            console.log(url);
 
             https.get(url, (response) => {
                 response.pipe(file);

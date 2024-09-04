@@ -25,7 +25,17 @@ const pdf_to_ia = async function (json) {
 
         await pdf(dataBuffer, options);
 
-        const prompt = "Instrução: Faça a conclusão do exame laboratorial informando a condição do paciente. Informação do exame: \n ";
+        //const prompt = "Instrução: Faça a conclusão do exame laboratorial informando a condição do paciente. Informação do exame: \n ";
+
+        const prompt = `
+            Monte 1 objeto json neste formato: 
+            {
+                "data" : "coloque aqui o dia que o exame foi realizado",
+                "nome": "coloque aqui o nome do paciente",
+                "conclusao":  "coloque aqui a conclusao do exame em 40 palavras no maximo e que nao seja muito tecnica que informe se esta bom ou ruim o resultado"
+            }
+            Serão apenas essas chaves nao invente outras chaves 
+            Esses sao os dados a ser analisado: `;
 
         let objItem = [];
 
@@ -39,12 +49,12 @@ const pdf_to_ia = async function (json) {
                     model: "llama3.1",
                     prompt: `${prompt} : ${pageTexts[i]}`,
                     stream: false,
-                    temperature: 0.5
+                    temperature: 0.1
                 })
             });
 
             const jsonResponse = await response.json();
-            objItem.push({ "analise": jsonResponse.response });
+            objItem.push({ "analise" : jsonResponse.response, "filename" : item.filename });
         }
 
         obj = obj.concat(objItem);
