@@ -13,7 +13,12 @@ const { update_exames } = require("./src/supabase/update_exames");
 functions.http('pdf_to_text', async (req, res) => {
     corsMiddleware(req, res, async () => {
         try {
-           
+
+            await supabase
+            .from('prontuarios')
+            .update({ ai:1 })
+            .match({ id: req.body.data.id, category: 179 })
+
             let json = await download_card(req);       
 
             let objIAanalise = await pdf_to_ia(json);        
@@ -33,6 +38,11 @@ functions.http('pdf_to_text', async (req, res) => {
                 });
               }
             });
+
+            await supabase
+            .from('prontuarios')
+            .update({ ai:0 })
+            .match({ id: json[0].prontuarios, category: 179 })
 
             res.status(200).send(objIAanalise);
 

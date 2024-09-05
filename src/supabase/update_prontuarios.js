@@ -19,9 +19,6 @@ const update_prontuarios = async function (json) {
         .from('prontuarios')
         .update({ label: text, update_uuid: uuidv4() })
         .match({ id: json[0].prontuarios, category: 179 })
-   
-
-
 
         return text;
 

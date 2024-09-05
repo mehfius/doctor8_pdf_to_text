@@ -10,8 +10,7 @@ const download_card = async function (req) {
     let param = {
         data: {
             id: req.body.data.id,
-            session: req.body.data.session,
-            category: req.body.data.category
+            session: req.body.data.session
         }
     };
 

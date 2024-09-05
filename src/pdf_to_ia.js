@@ -39,7 +39,6 @@ const pdf_to_ia = async function (json) {
             }
             Serão apenas essas chaves nao invente outras chaves.
             Você costuma responder no inicio informacoes que eu nao preciso por exemplo "aqui esta o seu resultado".
-            Não responsa nada alem do objeto.
             Toda sua resposta deve se limitar ao formato do objeto que pedi acima.
             Esses sao os dados a ser analisado: `;
 
@@ -50,7 +49,7 @@ const pdf_to_ia = async function (json) {
         
             while (!success) {
                 try {
-                    const response = await fetch('https://739e-45-163-147-247.ngrok-free.app/api/generate', {
+                    const response = await fetch('https://open-pumped-lacewing.ngrok-free.app/api/generate', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
