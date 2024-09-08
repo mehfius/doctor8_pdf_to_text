@@ -1,12 +1,13 @@
 const fs = require('fs');
-const path = require('path');
-const https = require('https');
 const pdf = require('pdf-parse');
+const { get_prompt } = require("./supabase/get_prompt");
 
 const pdf_to_ia = async function (json) {
+
     let obj = [];
  
     for (const item of json.files) {
+        
         const filePath = `./temp/${item.filename}`;
         const dataBuffer = fs.readFileSync(filePath);
 
@@ -24,23 +25,8 @@ const pdf_to_ia = async function (json) {
         };
 
         await pdf(dataBuffer, options);
-
-        //const prompt = "Instrução: Faça a conclusão do exame laboratorial informando a condição do paciente. Informação do exame: \n ";
-
-        const prompt = `
-            Monte 1 objeto json neste formato: 
-            {
-                "data" : "coloque aqui o dia que o exame foi realizado",
-                "nome": "coloque aqui o nome do paciente com palavras no formato Title Case",
-                "conclusao":  "coloque aqui a conclusao do exame e que nao seja muito tecnica que informe se o resultado é o esperado para ser saudavel",
-                "label": "coloque aqui o nome ou tipo do exame com palavras no formato de texto Title Case",
-                "alerta": "preencha aqui como true ou false se o exame merece atencao, pois nao esta com o resultado esperado",
-                "laboratorio": "nome do laboratorio, se não reconhecer alguma palavra coloque null como resposta"
-            }
-            Serão apenas essas chaves nao invente outras chaves.
-            Você costuma responder no inicio informacoes que eu nao preciso por exemplo "aqui esta o seu resultado".
-            Toda sua resposta deve se limitar ao formato do objeto que pedi acima.
-            Esses sao os dados a ser analisado: `;
+        
+        const prompt = await get_prompt();
 
         let objItem = [];
 
@@ -60,22 +46,42 @@ const pdf_to_ia = async function (json) {
                             stream: false,
                             temperature: 0.3
                         })
-                    });
+                    });                           
+
+                    r = await response;
+
+                    if(r.status == 200){
+
+                        const IAServerResponse = await r.json();    
+
+                        let JsonIAServerResponse = JSON.parse(IAServerResponse.response);
+
+                        objItem.push(
+                            { 
+                                ...JsonIAServerResponse,
+                                filename: item.filename,
+                                users: json.users,
+                                prontuarios: json.prontuarios,
+                                pdf: pageTexts[i]
+                            }
+                        );
+
+                        console.log("JSON parseado com sucesso, chaves encontradas:", Object.keys(JsonIAServerResponse).length);
+
+                    } else {
+
+                        console.error('Ngrok Offline');
+
+                    }                   
         
-                    const IAServerResponse = await response.json();
-        
-                    let JsonIAServerResponse = JSON.parse(IAServerResponse.response);
-                    objItem.push({ ...JsonIAServerResponse, filename: item.filename, users: json.users, prontuarios: json.prontuarios, pdf: pageTexts[i] });
-                    console.log("JSON parseado com sucesso, chaves encontradas:", Object.keys(JsonIAServerResponse).length);
-        
-                    success = true; // Sai do loop `while` se tudo deu certo
+                    success = true;
         
                 } catch (error) {
+                 
                     console.error("Erro ao parsear JSON ou na requisição:", error.message);
- 
-        
-                    // Aqui você pode adicionar uma lógica para limitar as tentativas ou esperar um tempo antes de tentar novamente
-                }
+                    console.error(error.message)
+
+               }
             }
         }
         
