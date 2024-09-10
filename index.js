@@ -9,7 +9,6 @@ const { update_prontuarios } = require("./src/supabase/update_prontuarios");
 const { update_exames } = require("./src/supabase/update_exames");
 const { update_ai } = require("./src/supabase/update_ai");
 
-
 functions.http('pdf_to_text', async (req, res) => {
     corsMiddleware(req, res, async () => {
         try {
