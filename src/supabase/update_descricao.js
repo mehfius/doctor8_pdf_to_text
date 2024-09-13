@@ -16,7 +16,7 @@ const update_descricao = async function (json) {
                 console.error(`Erro ao atualizar o arquivo ${item.filename}:`, error);
                 throw new Error(`Falha ao atualizar ${item.filename}`);
             } else {
-                console.log(`Arquivo ${item.filename} atualizado com sucesso.`);
+                console.log(`Registro na tabela [files] atualizado com sucesso.`,`${item.filename}`);
                 results.push(data);
             }
         }

@@ -9,9 +9,9 @@ const update_prontuarios = async function (json) {
         let text = ""
         for (const item of json) {
  
-            text += "Nome do exame:" + item.label + "\n";
+            text += "Exame: " + item.label + "\n";
             text += item.conclusao + "\n";
-            text += "Paciente:" + item.nome + "\n";            
+            text += "Paciente: " + item.nome + "\n";            
             text += " -------------- " + "\n";
         }
 
@@ -24,7 +24,7 @@ const update_prontuarios = async function (json) {
 
     } catch (error) {
         console.error('Erro ao processar atualização:', error.message);
-        throw error; // Rethrow the error to be handled by the caller, if needed
+        throw error; 
     }
 };
 

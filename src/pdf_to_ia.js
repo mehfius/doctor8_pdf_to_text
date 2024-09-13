@@ -66,7 +66,7 @@ const pdf_to_ia = async function (json) {
                             }
                         );
 
-                        console.log("JSON parseado com sucesso, chaves encontradas:", Object.keys(JsonIAServerResponse).length);
+                        console.log("IA JSON no formato correto, chaves encontradas: ", Object.keys(JsonIAServerResponse).length);
 
                     } else {
 
@@ -78,7 +78,7 @@ const pdf_to_ia = async function (json) {
         
                 } catch (error) {
                  
-                    console.error("Erro ao parsear JSON ou na requisição:", error.message);
+                    console.error("IA não conseguiu gerar JSON corretamente: ", error.message);
                     console.error(error.message)
 
                }

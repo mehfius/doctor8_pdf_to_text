@@ -23,7 +23,7 @@ const update_exames = async function (json) {
                 console.error(`Erro ao atualizar o arquivo ${item.filename}:`, error);
                 throw new Error(`Falha ao atualizar ${item.filename}`);
             } else {
-                console.log(`Arquivo ${item.filename} atualizado com sucesso.`);
+                console.log(`Registro na tabela [exames] atualizado com sucesso.`,`${item.filename} `);
                 results.push(data);
             }
         }
@@ -32,7 +32,7 @@ const update_exames = async function (json) {
 
     } catch (error) {
         console.error('Erro ao processar atualização:', error.message);
-        throw error; // Rethrow the error to be handled by the caller, if needed
+        throw error; 
     }
 };
 

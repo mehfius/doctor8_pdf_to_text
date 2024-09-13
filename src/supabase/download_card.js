@@ -20,7 +20,7 @@ const download_card = async function (req) {
         console.error('Erro ao chamar RPC:', error.message);
         throw error;
     }
-
+    //console.log(data)
     const downloadPromises = data.files.map(item => {
 
         return new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ const download_card = async function (req) {
                 response.pipe(file);
                 file.on('finish', () => {
                     file.close(() => {
-                        console.log(`Download de ${filename} concluído!`);
+                        console.log(`Download concluído!`,`${filename}`);
                         resolve();  // Resolve a promessa ao concluir o download
                     });
                 });
