@@ -10,7 +10,7 @@ const update_ai = async function (id,status) {
 
             await supabase
             .from('prontuarios')
-            .update({ ia: status, update_uuid: uuidv4(), label: 'Em análise pela IA, aguarde ...' })
+            .update({ ia: status, update_uuid: uuidv4() })
             .eq('id', id);
 
         } else {

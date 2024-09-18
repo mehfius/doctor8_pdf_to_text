@@ -1,23 +1,23 @@
 const { createClient } = require("@supabase/supabase-js");
 
 const update_exames = async function (json) {
+
     const supabase = createClient(process.env.URL, process.env.KEY);
 
     try {
-        const results = [];
+
+        const results = [];       
 
         await supabase
         .from('exames')
         .delete()
-        .match({ prontuarios: json[0].prontuarios })
+        .match({ prontuarios: json[0].prontuarios })      
       
-      
-        for (const item of json) {
-    
+        for (const item of json) {            
+         
             const { data, error } = await supabase
                 .from('exames')
-                .insert(item)
-   
+                .insert(item)   
 
             if (error) {
                 console.error(`Erro ao atualizar o arquivo ${item.filename}:`, error);
@@ -25,6 +25,7 @@ const update_exames = async function (json) {
             } else {
                 console.log(`Registro na tabela [exames] atualizado com sucesso.`,`${item.filename} `);
                 results.push(data);
+
             }
         }
 
