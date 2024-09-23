@@ -60,7 +60,6 @@ const pdf_to_ia = async function (json) {
                             objItem.push({
                                 ...objeto,
                                 filename: item.filename,
-                                users: json.users,
                                 prontuarios: json.prontuarios,
                                 pdf: pageTexts[i],
                                 pdf_page: i
