@@ -1,15 +1,15 @@
 const fs = require('fs');
 const pdf = require('pdf-parse');
-const { get_prompt } = require("./supabase/get_prompt");
+
+const { fetch_ia } = require("./fetch_ia");
 
 const pdf_to_ia = async function (json) {
 
     let obj = [];
  
-    for (const item of json.files) {
-        
-        const filePath = `./temp/${item.filename}`;
-        const dataBuffer = fs.readFileSync(filePath);
+    for (const item of json.files) {        
+
+        const dataBuffer = fs.readFileSync(`./temp/${item.filename}`);
 
         const pageTexts = [];
 
@@ -24,9 +24,7 @@ const pdf_to_ia = async function (json) {
             }
         };
 
-        await pdf(dataBuffer, options);
-        
-        const prompt = await get_prompt();
+        await pdf(dataBuffer, options);   
 
         let objItem = [];
 
@@ -34,39 +32,42 @@ const pdf_to_ia = async function (json) {
             let success = false;
         
             while (!success) {
-                try {
-                    const response = await fetch('https://open-pumped-lacewing.ngrok-free.app/api/generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: "llama3.1",
-                            prompt: `${prompt} : ${pageTexts[i]}`,
-                            stream: false,
-                            temperature: 0.3
-                        })
-                    });                           
+                try {                         
 
-                    r = await response;
-
+                    r = await fetch_ia(pageTexts[i]);
+                    
                     if(r.status == 200){
 
                         const IAServerResponse = await r.json();    
 
                         let JsonIAServerResponse = JSON.parse(IAServerResponse.response);
+           
+                        const chavesParaVerificar = ['conclusao', 'label'];
 
-                        objItem.push(
-                            { 
-                                ...JsonIAServerResponse,
+                        // Verifica se JsonIAServerResponse é um array
+                        if (!Array.isArray(JsonIAServerResponse)) {
+                            JsonIAServerResponse = [JsonIAServerResponse]; // Converte para array se não for
+                        }
+
+                        // Verifica cada objeto no array
+                        for (const objeto of JsonIAServerResponse) {
+                            for (const chave of chavesParaVerificar) {
+                                if (!objeto.hasOwnProperty(chave)) {
+                                    throw new Error(`A chave '${chave}' é obrigatória, mas não foi encontrada em um dos objetos.`);
+                                }
+                            }
+
+                            objItem.push({
+                                ...objeto,
                                 filename: item.filename,
                                 users: json.users,
                                 prontuarios: json.prontuarios,
-                                pdf: pageTexts[i]
-                            }
-                        );
+                                pdf: pageTexts[i],
+                                pdf_page: i
+                            });
+                        }
 
-                        console.log("IA JSON no formato correto, chaves encontradas: ", Object.keys(JsonIAServerResponse).length);
+                        console.log("IA JSON no formato correto, objetos processados: ", JsonIAServerResponse.length);
 
                     } else {
 
@@ -77,14 +78,13 @@ const pdf_to_ia = async function (json) {
                     success = true;
         
                 } catch (error) {
-                 
+                    
                     console.error("IA não conseguiu gerar JSON corretamente: ", error.message);
                     console.error(error.message)
 
                }
             }
-        }
-        
+        }        
 
         obj = obj.concat(objItem);
     }

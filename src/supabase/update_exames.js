@@ -14,7 +14,7 @@ const update_exames = async function (json) {
         .match({ prontuarios: json[0].prontuarios })      
       
         for (const item of json) {            
-         
+          
             const { data, error } = await supabase
                 .from('exames')
                 .insert(item)   

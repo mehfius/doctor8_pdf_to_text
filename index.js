@@ -16,7 +16,8 @@ functions.http('pdf_to_text', async (req, res) => {
             let json = await download_card(req);     
             if(json.files.length){
               await update_ai(req.body.data.id, 1);
-              let objIAanalise = await pdf_to_ia(json);      
+              let objIAanalise = await pdf_to_ia(json);    
+              console.log(objIAanalise)  
               await update_exames(objIAanalise);
               //let prontuarios = await update_prontuarios(objIAanalise);
               const directory = './temp/';
