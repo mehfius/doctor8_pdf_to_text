@@ -30,14 +30,23 @@ functions.http('pdf_to_text', async (req, res) => {
                 }
               }); 
               await update_ai(req.body.data.id, 0);
-              res.status(200).send(objIAanalise);
+              res.status(200).json({
+                status: 1,
+                data: objIAanalise
+              });
             } else {
               console.log(`O card [${req.body.data.id}] não possui arquivos PDF`);
-              res.status(200).send(`O card [${req.body.data.id}] não possui arquivos PDF`);
+              res.status(200).json({
+                status: 0,
+                message: `O card [${req.body.data.id}] não possui arquivos PDF`
+              });
             }
         } catch (error) {
             console.error('Erro:', error);
-            res.status(500).send('Erro',error);
+            res.status(500).json({
+              status: 0,
+              message: 'Erro: ' + error.message
+            });
         }
     });
 });
