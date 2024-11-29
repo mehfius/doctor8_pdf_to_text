@@ -4,7 +4,8 @@ const corsMiddleware = cors({ origin: true });
 const fs = require('fs');
 const path = require('path');
 
-const { download_card } = require("./src/supabase/download_card");
+//const { download_card } = require("./src/supabase/download_card");
+const { get_file_url } = require("./src/supabase/get_file_url");
 const { pdf_to_ia } = require("./src/pdf_to_ia");
 const { update_prontuarios } = require("./src/supabase/update_prontuarios");
 const { update_exames } = require("./src/supabase/update_exames");
@@ -13,22 +14,13 @@ const { update_ai } = require("./src/supabase/update_ai");
 functions.http('pdf_to_text', async (req, res) => {
     corsMiddleware(req, res, async () => {
         try {
-            let json = await download_card(req);     
+            let json = await get_file_url(req); 
+           
             if(json.files.length){
               await update_ai(req.body.data.id, 1);
               let objIAanalise = await pdf_to_ia(json);    
-              console.log(objIAanalise)  
-              await update_exames(objIAanalise);
-              //let prontuarios = await update_prontuarios(objIAanalise);
-              const directory = './temp/';
-              fs.readdir(directory, (err, files) => {
-                if (err) throw err;              
-                for (const file of files) {
-                  fs.unlink(path.join(directory, file), err => {
-                    if (err) throw err;
-                  });
-                }
-              }); 
+              await update_exames(objIAanalise);    
+ 
               await update_ai(req.body.data.id, 0);
               res.status(200).json({
                 status: 1,
@@ -40,7 +32,8 @@ functions.http('pdf_to_text', async (req, res) => {
                 status: 0,
                 message: `O card [${req.body.data.id}] não possui arquivos PDF`
               });
-            }
+            } 
+
         } catch (error) {
             console.error('Erro:', error);
             res.status(500).json({

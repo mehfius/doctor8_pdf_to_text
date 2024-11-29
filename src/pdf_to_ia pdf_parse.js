@@ -9,44 +9,48 @@ const pdf_to_ia = async function (json) {
  
     for (const item of json.files) {        
 
-        const response = await fetch('http://localhost:8081/pdf_to_text', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                data: {
-                    url: item.url
-                }
-            })
-        });      
+        const dataBuffer = fs.readFileSync(`./temp/${item.filename}`);
 
-        const text = await response.text();
-     
-        var objItem = [];
+        const pageTexts = [];
 
+        const options = {
+            pagerender: (pageData) => {
+                return pageData.getTextContent().then(textContent => {
+                    let pageText = textContent.items.map(item => item.str).join(' ');
+                    pageText = pageText.replace(/[^\x20-\x7E]/g, '');
+                    pageTexts.push(pageText);
+                    return pageText;
+                });
+            }
+        };
+
+        await pdf(dataBuffer, options);   
+
+        let objItem = [];
+
+        for (let i = 0; i < pageTexts.length; i++) {
             let success = false;
         
             while (!success) {
                 try {                         
 
-                    r = await fetch_ia(text);
+                    r = await fetch_ia(pageTexts[i]);
                     
                     if(r.status == 200){
 
-                        const IAServerResponse = await r.json();                         
-                
+                        const IAServerResponse = await r.json();    
 
                         let JsonIAServerResponse = JSON.parse(IAServerResponse.response);
            
                         const chavesParaVerificar = ['conclusao', 'label'];
-                        
-                        if (!Array.isArray(JsonIAServerResponse)) {
-                            JsonIAServerResponse = [JsonIAServerResponse];
-                        }                      
 
+                        // Verifica se JsonIAServerResponse é um array
+                        if (!Array.isArray(JsonIAServerResponse)) {
+                            JsonIAServerResponse = [JsonIAServerResponse]; // Converte para array se não for
+                        }
+
+                        // Verifica cada objeto no array
                         for (const objeto of JsonIAServerResponse) {
-                           
                             for (const chave of chavesParaVerificar) {
                                 if (!objeto.hasOwnProperty(chave)) {
                                     throw new Error(`A chave '${chave}' é obrigatória, mas não foi encontrada em um dos objetos.`);
@@ -56,11 +60,10 @@ const pdf_to_ia = async function (json) {
                             objItem.push({
                                 ...objeto,
                                 filename: item.filename,
-                                prontuarios: item.prontuarios,
-                                pdf: text,
-                                pdf_page: 0
+                                prontuarios: json.prontuarios,
+                                pdf: pageTexts[i],
+                                pdf_page: i
                             });
-                            
                         }
 
                         console.log("IA JSON no formato correto, objetos processados: ", JsonIAServerResponse.length);
@@ -83,7 +86,7 @@ const pdf_to_ia = async function (json) {
         }        
 
         obj = obj.concat(objItem);
-    
+    }
 
     return obj;
 };
